@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import * as React from 'react';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
@@ -7,8 +8,25 @@ import { Map, Polygon } from 'react-kakao-maps-sdk';
 import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 import Link from '@mui/material/Link';
-import Chart from './Chart';
+import Button from '@mui/material/Button';
+import Stack from '@mui/material/Stack';
+import { styled } from '@mui/material/styles';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
 import Deposits from './Deposits';
+import Chart from './Chart';
+
+const Item = styled(Paper)(({ theme }) => ({
+  backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
+  ...theme.typography.body2,
+  padding: theme.spacing(1),
+  textAlign: 'center',
+  color: theme.palette.text.secondary,
+}));
 
 function Copyright(props: any) {
   return (
@@ -37,7 +55,7 @@ export default function MapPage() {
   const polygonPath: Array<Point> = JSON.parse(
     '[{"lat": 37.535582577099, "lng": 126.86622218405}, {"lat": 37.535568696403, "lng": 126.86589975064}, {"lat": 37.535052923074, "lng": 126.86594310261}, {"lat": 37.535046326047, "lng": 126.86608454247}, {"lat": 37.535062119175, "lng": 126.86610714273}, {"lat": 37.535431499599, "lng": 126.86608102515}, {"lat": 37.535440682694, "lng": 126.86623375183}, {"lat": 37.535582577099, "lng": 126.86622218405}]',
   );
-  console.log(polygonPath);
+  // console.log(polygonPath);
 
   let centroid = polygonPath.reduce(
     (prevPoint: Point, currPoint: Point) => {
@@ -53,7 +71,7 @@ export default function MapPage() {
     lat: centroid.lat / polygonPath.length,
     lng: centroid.lng / polygonPath.length,
   };
-  console.log(centroid);
+  // console.log(centroid);
 
   return (
     <Box
@@ -121,9 +139,38 @@ export default function MapPage() {
                   strokeOpacity={0.8} // 선의 불투명도입니다 0에서 1 사이값이며 0에 가까울수록 투명합니다
                   strokeStyle="solid" // 선의 스타일입니다
                   fillColor="#EFFFED" // 채우기 색깔입니다
-                  fillOpacity={0.8} // 채우기 불투명도입니다
+                  fillOpacity={0.5} // 채우기 불투명도입니다
                 />
               </Map>
+            </Paper>
+          </Grid>
+          {/* 건물 */}
+          <Grid item xs={12}>
+            <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
+              <Grid container spacing={2}>
+                <Grid item lg={1} xs={4}>
+                  <Item>지번</Item>
+                </Grid>
+                <Grid item lg={1} xs={4}>
+                  <Item>건물명</Item>
+                </Grid>
+                <Grid item lg={1} xs={4}>
+                  <Item>입구</Item>
+                </Grid>
+                <Grid item lg={9} xs={12} />
+                <TableContainer>
+                  <Table sx={{ minWidth: 300 }} aria-label="simple table">
+                    <TableBody>
+                      <TableRow>
+                        <TableCell align="center">101</TableCell>
+                        <TableCell align="center">102</TableCell>
+                        <TableCell align="center">103</TableCell>
+                        <TableCell align="center">104</TableCell>
+                      </TableRow>
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              </Grid>
             </Paper>
           </Grid>
         </Grid>
