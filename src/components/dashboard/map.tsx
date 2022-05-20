@@ -19,6 +19,7 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Deposits from './Deposits';
 import Chart from './Chart';
+import { Gate } from './VisitTable';
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
@@ -56,6 +57,10 @@ export default function MapPage() {
     '[{"lat": 37.535582577099, "lng": 126.86622218405}, {"lat": 37.535568696403, "lng": 126.86589975064}, {"lat": 37.535052923074, "lng": 126.86594310261}, {"lat": 37.535046326047, "lng": 126.86608454247}, {"lat": 37.535062119175, "lng": 126.86610714273}, {"lat": 37.535431499599, "lng": 126.86608102515}, {"lat": 37.535440682694, "lng": 126.86623375183}, {"lat": 37.535582577099, "lng": 126.86622218405}]',
   );
   // console.log(polygonPath);
+
+  const VisitTableInfo = JSON.parse(
+    '["23-6","고운아이 어린이집","",["어린이집", 102, 201, 202, 301, 302, 401]]',
+  );
 
   let centroid = polygonPath.reduce(
     (prevPoint: Point, currPoint: Point) => {
@@ -147,30 +152,12 @@ export default function MapPage() {
           {/* 건물 */}
           <Grid item xs={12}>
             <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
-              <Grid container spacing={2}>
-                <Grid item lg={1} xs={4}>
-                  <Item>지번</Item>
-                </Grid>
-                <Grid item lg={1} xs={4}>
-                  <Item>건물명</Item>
-                </Grid>
-                <Grid item lg={1} xs={4}>
-                  <Item>입구</Item>
-                </Grid>
-                <Grid item lg={9} xs={12} />
-                <TableContainer>
-                  <Table sx={{ minWidth: 300 }} aria-label="simple table">
-                    <TableBody>
-                      <TableRow>
-                        <TableCell align="center">101</TableCell>
-                        <TableCell align="center">102</TableCell>
-                        <TableCell align="center">103</TableCell>
-                        <TableCell align="center">104</TableCell>
-                      </TableRow>
-                    </TableBody>
-                  </Table>
-                </TableContainer>
-              </Grid>
+              <Gate
+                address={VisitTableInfo[0]}
+                buildingName={VisitTableInfo[1]}
+                gateName={VisitTableInfo[2]}
+                houseHoldList={VisitTableInfo[3]}
+              />
             </Paper>
           </Grid>
         </Grid>
