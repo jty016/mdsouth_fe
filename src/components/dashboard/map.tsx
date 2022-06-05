@@ -8,18 +8,12 @@ import { Map, Polygon } from 'react-kakao-maps-sdk';
 import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 import Link from '@mui/material/Link';
-import Button from '@mui/material/Button';
-import Stack from '@mui/material/Stack';
 import { styled } from '@mui/material/styles';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
+import { DropResult } from 'react-beautiful-dnd';
 import Deposits from './Deposits';
 import Chart from './Chart';
-import { Gate } from './VisitTable';
+import { GateView, GateEditable } from '../territorycard/Gate';
+import { reorder } from '../helpers';
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
@@ -62,6 +56,15 @@ export default function MapPage() {
     '["23-6","고운아이 어린이집","",["어린이집", 102, 201, 202, 301, 302, 401]]',
   );
 
+  const households = VisitTableInfo[3].map((elem: any, index: number) => {
+    return {
+      id: index,
+      name: elem.toString(),
+      status: 'intact',
+      isLock: true,
+    };
+  });
+
   let centroid = polygonPath.reduce(
     (prevPoint: Point, currPoint: Point) => {
       return {
@@ -77,6 +80,28 @@ export default function MapPage() {
     lng: centroid.lng / polygonPath.length,
   };
   // console.log(centroid);
+
+  const [items, setItems] = React.useState([
+    {
+      id: 'Item 1',
+      primary: 'Refined Frozen Pants',
+      secondary: 'test1',
+    },
+    {
+      id: 'Item 3',
+      primary: 'Rustic Concrete Chicken',
+      secondary: 'test2',
+    },
+  ]);
+
+  const onDragEnd = ({ destination, source }: DropResult) => {
+    // dropped outside the list
+    if (!destination) return;
+
+    const newItems = reorder(items, source.index, destination.index);
+
+    setItems(newItems);
+  };
 
   return (
     <Box
@@ -152,11 +177,24 @@ export default function MapPage() {
           {/* 건물 */}
           <Grid item xs={12}>
             <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
-              <Gate
+              <GateView
                 address={VisitTableInfo[0]}
                 buildingName={VisitTableInfo[1]}
                 gateName={VisitTableInfo[2]}
-                houseHoldList={VisitTableInfo[3]}
+                households={households}
+              />
+            </Paper>
+          </Grid>
+          <Grid item xs={12}>
+            {/* <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
+              <DraggableList items={items} onDragEnd={onDragEnd} />
+            </Paper> */}
+            <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
+              <GateEditable
+                address={VisitTableInfo[0]}
+                buildingName={VisitTableInfo[1]}
+                gateName={VisitTableInfo[2]}
+                households={households}
               />
             </Paper>
           </Grid>
