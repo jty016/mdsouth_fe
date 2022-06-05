@@ -10,16 +10,20 @@ function preventDefault(event: React.MouseEvent) {
 export default function Deposits() {
   return (
     <>
-      <Title>Recent Deposits</Title>
-      <Typography component="p" variant="h4">
-        $3,024.00
+      <Title>Recent Visitors</Title>
+      <Typography component="p" variant="h6">
+        조태영
+      </Typography>
+      <Typography component="p" variant="h6">
+        김성희
       </Typography>
       <Typography color="text.secondary" sx={{ flex: 1 }}>
-        on 15 March, 2019
+        14:22:56 2022-06-06 KST
       </Typography>
+
       <div>
         <Link color="primary" href="#" onClick={preventDefault}>
-          View balance
+          View history
         </Link>
       </div>
     </>
