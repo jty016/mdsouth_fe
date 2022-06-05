@@ -1,4 +1,4 @@
-/* eslint-disable no-unused-vars */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import * as React from 'react';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
@@ -14,6 +14,7 @@ import Deposits from './Deposits';
 import Chart from './Chart';
 import { GateView, GateEditable } from '../territorycard/Gate';
 import { reorder } from '../helpers';
+import { HouseholdVisitStatus } from '../territorycard/HouseHold';
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
@@ -60,7 +61,7 @@ export default function MapPage() {
     return {
       id: index,
       name: elem.toString(),
-      status: 'intact',
+      status: HouseholdVisitStatus.intact,
       isLock: true,
     };
   });

@@ -1,5 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable react/jsx-props-no-spreading */
-/* eslint-disable no-unused-vars */
 import * as React from 'react';
 import {
   Table,
@@ -18,6 +18,7 @@ import {
   HouseHoldButton,
   HouseholdOpsButton,
   ToggleEditButton,
+  HouseholdVisitStatus,
 } from './HouseHold';
 
 interface GateProps {
@@ -29,14 +30,35 @@ interface GateProps {
 
 export function GateView(props: GateProps) {
   const { address, buildingName, gateName, households } = props;
+  const [householdList, setHouseholdItems] = React.useState(households);
 
-  const houseHoldItems = households.map(household => {
+  const handleButtonClick = (id: number) => () => {
+    setHouseholdItems(
+      householdList.map((household, index) => {
+        const currHousehold = household;
+        if (currHousehold.id === id) {
+          if (currHousehold.status === HouseholdVisitStatus.met) {
+            currHousehold.status = HouseholdVisitStatus.intact;
+          } else {
+            currHousehold.status = householdList[index].status + 1;
+          }
+          console.log(id);
+          console.log(currHousehold);
+        }
+
+        return currHousehold;
+      }),
+    );
+  };
+
+  const houseHoldButtons = householdList.map(household => {
     return (
       <HouseHoldButton
         key={household.id}
         id={household.id}
         name={household.name}
-        status="intact"
+        status={household.status}
+        onClick={handleButtonClick}
       />
     );
   });
@@ -53,7 +75,7 @@ export function GateView(props: GateProps) {
             {gateName}
           </TableCell>
           <TableCell align="left" size="small" padding="none">
-            {houseHoldItems}
+            {houseHoldButtons}
           </TableCell>
         </TableRow>
       </TableBody>
@@ -118,7 +140,7 @@ export function GateEditable(props: GateProps) {
       {
         id: householdList.length,
         name: '',
-        status: 'intact',
+        status: HouseholdVisitStatus.intact,
         isLock: false,
       },
     ]);

@@ -41,6 +41,9 @@ module.exports = {
     'jsx-a11y/no-noninteractive-element-interactions': 0,
     'jsx-a11y/anchor-is-valid': 0,
     'react/require-default-props': 'off',
+    // note you must disable the base rule as it can report incorrect errors
+    'no-unused-vars': 'off',
+    '@typescript-eslint/no-unused-vars': ['error'],
   },
   ignorePatterns: ['dist/', 'node_modules/'],
 };
