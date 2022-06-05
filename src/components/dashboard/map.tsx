@@ -58,12 +58,16 @@ export default function MapPage() {
   );
 
   const households = VisitTableInfo[3].map((elem: any, index: number) => {
-    return {
+    const currHousehold = {
       id: index,
       name: elem.toString(),
-      status: HouseholdVisitStatus.intact,
+      status:
+        index === 0
+          ? HouseholdVisitStatus.noVisit
+          : HouseholdVisitStatus.intact,
       isLock: true,
     };
+    return currHousehold;
   });
 
   let centroid = polygonPath.reduce(

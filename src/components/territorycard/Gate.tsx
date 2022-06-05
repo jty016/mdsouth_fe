@@ -7,6 +7,7 @@ import {
   TableHead,
   TableRow,
   TableCell,
+  Checkbox,
 } from '@mui/material';
 // import TableHead from '@mui/material/TableHead';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
@@ -118,10 +119,11 @@ export function GateEditable(props: GateProps) {
   const handleEditToggle = (id: number) => () => {
     setHouseholdList(
       householdList.map((household: HouseholdProps) => {
-        if (household.id === id) {
-          householdList[id].isLock = !household.isLock;
+        const currHousehold = household;
+        if (currHousehold.id === id) {
+          currHousehold.isLock = !household.isLock;
         }
-        return household;
+        return currHousehold;
       }),
     );
   };
@@ -157,6 +159,22 @@ export function GateEditable(props: GateProps) {
     );
   };
 
+  const onNoVisitStatusChanged = (id: number) => () => {
+    setHouseholdList(
+      householdList.map((household: HouseholdProps) => {
+        const currHousehold = household;
+        if (currHousehold.id === id) {
+          if (currHousehold.status === HouseholdVisitStatus.noVisit) {
+            currHousehold.status = HouseholdVisitStatus.intact;
+          } else {
+            currHousehold.status = HouseholdVisitStatus.noVisit;
+          }
+        }
+        return currHousehold;
+      }),
+    );
+  };
+
   // Normally you would want to split things out into separate components.
   // But in this example everything is just done in one place for simplicity
   return (
@@ -177,7 +195,9 @@ export function GateEditable(props: GateProps) {
               <TableHead>
                 <TableRow>
                   <TableCell>Title</TableCell>
-                  <TableCell>Test</TableCell>
+                  <TableCell>Name</TableCell>
+                  <TableCell>NoVisit</TableCell>
+                  <TableCell>Ops</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -211,6 +231,16 @@ export function GateEditable(props: GateProps) {
                             defaultValue={item.name}
                             variant="standard"
                             margin="dense"
+                          />
+                        </TableCell>
+                        <TableCell sx={{ whiteSpace: 'nowrap' }} padding="none">
+                          <Checkbox
+                            id={item.id.toString()}
+                            disabled={item.isLock}
+                            checked={
+                              item.status === HouseholdVisitStatus.noVisit
+                            }
+                            onChange={onNoVisitStatusChanged(item.id)}
                           />
                         </TableCell>
                         <TableCell />
