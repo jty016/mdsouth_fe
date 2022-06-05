@@ -37,7 +37,7 @@ export function MainListItems(props: MainListProps) {
         </ListItemIcon>
         <ListItemText primary="Customers" />
       </ListItemButton>
-      <ListItemButton key="Reports" onClick={handleClick('Report')}>
+      <ListItemButton key="Reports" onClick={handleClick('Reports')}>
         <ListItemIcon>
           <BarChartIcon />
         </ListItemIcon>

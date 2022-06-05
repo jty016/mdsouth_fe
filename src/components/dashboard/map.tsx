@@ -1,14 +1,27 @@
+/* eslint-disable no-unused-vars */
 import * as React from 'react';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
 import Container from '@mui/material/Container';
 import Grid from '@mui/material/Grid';
-import { Map } from 'react-kakao-maps-sdk';
+import { Map, Polygon } from 'react-kakao-maps-sdk';
 import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 import Link from '@mui/material/Link';
-import Chart from './Chart';
+import { styled } from '@mui/material/styles';
+import { DropResult } from 'react-beautiful-dnd';
 import Deposits from './Deposits';
+import Chart from './Chart';
+import { GateView, GateEditable } from '../territorycard/Gate';
+import { reorder } from '../helpers';
+
+const Item = styled(Paper)(({ theme }) => ({
+  backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
+  ...theme.typography.body2,
+  padding: theme.spacing(1),
+  textAlign: 'center',
+  color: theme.palette.text.secondary,
+}));
 
 function Copyright(props: any) {
   return (
@@ -28,7 +41,68 @@ function Copyright(props: any) {
   );
 }
 
+type Point = {
+  lat: number;
+  lng: number;
+};
+
 export default function MapPage() {
+  const polygonPath: Array<Point> = JSON.parse(
+    '[{"lat": 37.535582577099, "lng": 126.86622218405}, {"lat": 37.535568696403, "lng": 126.86589975064}, {"lat": 37.535052923074, "lng": 126.86594310261}, {"lat": 37.535046326047, "lng": 126.86608454247}, {"lat": 37.535062119175, "lng": 126.86610714273}, {"lat": 37.535431499599, "lng": 126.86608102515}, {"lat": 37.535440682694, "lng": 126.86623375183}, {"lat": 37.535582577099, "lng": 126.86622218405}]',
+  );
+  // console.log(polygonPath);
+
+  const VisitTableInfo = JSON.parse(
+    '["23-6","고운아이 어린이집","",["어린이집", 102, 201, 202, 301, 302, 401]]',
+  );
+
+  const households = VisitTableInfo[3].map((elem: any, index: number) => {
+    return {
+      id: index,
+      name: elem.toString(),
+      status: 'intact',
+      isLock: true,
+    };
+  });
+
+  let centroid = polygonPath.reduce(
+    (prevPoint: Point, currPoint: Point) => {
+      return {
+        lat: prevPoint.lat + currPoint.lat,
+        lng: prevPoint.lng + currPoint.lng,
+      };
+    },
+    { lat: 0, lng: 0 },
+  );
+
+  centroid = {
+    lat: centroid.lat / polygonPath.length,
+    lng: centroid.lng / polygonPath.length,
+  };
+  // console.log(centroid);
+
+  const [items, setItems] = React.useState([
+    {
+      id: 'Item 1',
+      primary: 'Refined Frozen Pants',
+      secondary: 'test1',
+    },
+    {
+      id: 'Item 3',
+      primary: 'Rustic Concrete Chicken',
+      secondary: 'test2',
+    },
+  ]);
+
+  const onDragEnd = ({ destination, source }: DropResult) => {
+    // dropped outside the list
+    if (!destination) return;
+
+    const newItems = reorder(items, source.index, destination.index);
+
+    setItems(newItems);
+  };
+
   return (
     <Box
       component="main"
@@ -78,15 +152,49 @@ export default function MapPage() {
               <Map // 지도를 표시할 Container
                 center={{
                   // 지도의 중심좌표
-                  lat: 33.450701,
-                  lng: 126.570667,
+                  lat: centroid.lat,
+                  lng: centroid.lng,
                 }}
                 style={{
                   // 지도의 크기
                   width: '100%',
                   height: '450px',
                 }}
-                level={3} // 지도의 확대 레벨
+                level={1} // 지도의 확대 레벨
+              >
+                <Polygon
+                  path={polygonPath}
+                  strokeWeight={3} // 선의 두께입니다
+                  strokeColor="#39DE2A" // 선의 색깔입니다
+                  strokeOpacity={0.8} // 선의 불투명도입니다 0에서 1 사이값이며 0에 가까울수록 투명합니다
+                  strokeStyle="solid" // 선의 스타일입니다
+                  fillColor="#EFFFED" // 채우기 색깔입니다
+                  fillOpacity={0.5} // 채우기 불투명도입니다
+                />
+              </Map>
+            </Paper>
+          </Grid>
+          {/* 건물 */}
+          <Grid item xs={12}>
+            <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
+              <GateView
+                address={VisitTableInfo[0]}
+                buildingName={VisitTableInfo[1]}
+                gateName={VisitTableInfo[2]}
+                households={households}
+              />
+            </Paper>
+          </Grid>
+          <Grid item xs={12}>
+            {/* <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
+              <DraggableList items={items} onDragEnd={onDragEnd} />
+            </Paper> */}
+            <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
+              <GateEditable
+                address={VisitTableInfo[0]}
+                buildingName={VisitTableInfo[1]}
+                gateName={VisitTableInfo[2]}
+                households={households}
               />
             </Paper>
           </Grid>
