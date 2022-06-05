@@ -97,7 +97,7 @@ function MainBox(props: MainBoxProps) {
     mainBox = <BlackBox />;
   }
 
-  return <>{mainBox};</>;
+  return <>{mainBox} </>;
 }
 
 function DashboardContent() {
