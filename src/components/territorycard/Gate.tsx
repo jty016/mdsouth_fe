@@ -38,13 +38,14 @@ export function GateView(props: GateProps) {
       householdList.map((household, index) => {
         const currHousehold = household;
         if (currHousehold.id === id) {
+          if (currHousehold.status === HouseholdVisitStatus.noVisit) {
+            return currHousehold;
+          }
           if (currHousehold.status === HouseholdVisitStatus.met) {
             currHousehold.status = HouseholdVisitStatus.intact;
           } else {
             currHousehold.status = householdList[index].status + 1;
           }
-          console.log(id);
-          console.log(currHousehold);
         }
 
         return currHousehold;
