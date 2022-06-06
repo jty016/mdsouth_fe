@@ -15,6 +15,7 @@ import Chart from './Chart';
 import { GateView, GateEditable } from '../territorycard/Gate';
 import { reorder } from '../helpers';
 import { HouseholdVisitStatus } from '../territorycard/HouseHold';
+import { TerritoryMap } from '../territorycard/TerritoryMap';
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
@@ -154,29 +155,7 @@ export default function MapPage() {
           <Grid item xs={12}>
             <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
               {/* <Orders /> */}
-              <Map // 지도를 표시할 Container
-                center={{
-                  // 지도의 중심좌표
-                  lat: centroid.lat,
-                  lng: centroid.lng,
-                }}
-                style={{
-                  // 지도의 크기
-                  width: '100%',
-                  height: '450px',
-                }}
-                level={1} // 지도의 확대 레벨
-              >
-                <Polygon
-                  path={polygonPath}
-                  strokeWeight={3} // 선의 두께입니다
-                  strokeColor="#39DE2A" // 선의 색깔입니다
-                  strokeOpacity={0.8} // 선의 불투명도입니다 0에서 1 사이값이며 0에 가까울수록 투명합니다
-                  strokeStyle="solid" // 선의 스타일입니다
-                  fillColor="#EFFFED" // 채우기 색깔입니다
-                  fillOpacity={0.5} // 채우기 불투명도입니다
-                />
-              </Map>
+              <TerritoryMap centroid={centroid} path={polygonPath} />
             </Paper>
           </Grid>
           {/* 건물 */}

@@ -12,7 +12,7 @@
     "@types/react-dom": "latest",
     "react": "latest",
     "react-dom": "latest",
-    "react-kakao-maps-sdk": "^1.0.7",
+    "react-kakao-maps-sdk": "^1.1.1",
     "react-scripts": "latest",
     "recharts": "^2.1.9",
     "typescript": "latest"
@@ -43,7 +43,7 @@
     "eslint-config-airbnb": "^19.0.4",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-prettier": "^4.0.0",
-    "kakao.maps.d.ts": "^0.1.26",
+    "kakao.maps.d.ts": "^0.1.32",
     "prettier": "^2.6.2",
     "react-beautiful-dnd": "^13.1.0"
   }
