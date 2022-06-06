@@ -8,6 +8,10 @@ import {
   TableRow,
   TableCell,
   Checkbox,
+  Button,
+  Grid,
+  Paper,
+  TableContainer,
 } from '@mui/material';
 // import TableHead from '@mui/material/TableHead';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
@@ -29,41 +33,10 @@ interface GateProps {
   households: Array<HouseholdProps>;
 }
 
-export function GateView(props: GateProps) {
-  const { address, buildingName, gateName, households } = props;
-  const [householdList, setHouseholdItems] = React.useState(households);
-
-  const handleButtonClick = (id: number) => () => {
-    setHouseholdItems(
-      householdList.map((household, index) => {
-        const currHousehold = household;
-        if (currHousehold.id === id) {
-          if (currHousehold.status === HouseholdVisitStatus.noVisit) {
-            return currHousehold;
-          }
-          if (currHousehold.status === HouseholdVisitStatus.met) {
-            currHousehold.status = HouseholdVisitStatus.intact;
-          } else {
-            currHousehold.status = householdList[index].status + 1;
-          }
-        }
-
-        return currHousehold;
-      }),
-    );
-  };
-
-  const houseHoldButtons = householdList.map(household => {
-    return (
-      <HouseHoldButton
-        key={household.id}
-        id={household.id}
-        name={household.name}
-        status={household.status}
-        onClick={handleButtonClick}
-      />
-    );
-  });
+export function GateView(props: any) {
+  const { address, buildingName, gateName, households, ...otherProps } = props;
+  const { handleGateEditToggle, isLock, handleHouseholdButtonClick } =
+    otherProps;
 
   return (
     <Table aria-label="simple table">
@@ -73,11 +46,28 @@ export function GateView(props: GateProps) {
           <TableCell>{buildingName}</TableCell>
         </TableRow>
         <TableRow hover>
-          <TableCell component="th" scope="row">
+          <TableCell component="th" scope="row" padding="none">
             {gateName}
           </TableCell>
+          <TableCell component="th" scope="row" padding="none">
+            <ToggleEditButton
+              id={1}
+              isLock={isLock}
+              onClick={handleGateEditToggle}
+            />
+          </TableCell>
           <TableCell align="left" size="small" padding="none">
-            {houseHoldButtons}
+            {households.map((household: HouseholdProps) => {
+              return (
+                <HouseHoldButton
+                  key={household.id}
+                  id={household.id}
+                  name={household.name}
+                  status={household.status}
+                  onClick={handleHouseholdButtonClick}
+                />
+              );
+            })}
           </TableCell>
         </TableRow>
       </TableBody>
@@ -114,10 +104,142 @@ export const reorder = (
   return result;
 };
 
-export function GateEditable(props: GateProps) {
-  const { address, buildingName, gateName, households } = props;
+interface GateEditableProps extends GateProps {
+  setHouseholdList(list: HouseholdProps[]): HouseholdProps[];
+}
+
+export function GateEditable(props: any) {
+  const {
+    households,
+    handleHouseholdEditToggle,
+    handleHouseholdDelete,
+    handleHouseholdAdd,
+    onDragEnd,
+    onNoVisitStatusChanged,
+    handleHouseholdNameChanged,
+  } = props;
+
+  // Normally you would want to split things out into separate components.
+  // But in this example everything is just done in one place for simplicity
+  return (
+    <TableContainer
+      sx={{
+        height: 400,
+      }}
+    >
+      <DragDropContext onDragEnd={onDragEnd}>
+        <Droppable droppableId="droppable" direction="vertical">
+          {(provided, snapshot) => (
+            <>
+              <Table
+                aria-label="simple table"
+                ref={provided.innerRef}
+                sx={{
+                  height: 'max-content',
+                }}
+                stickyHeader
+                // style={getListStyle(snapshot.isDraggingOver)}
+              >
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Title</TableCell>
+                    <TableCell>Name</TableCell>
+                    <TableCell>NoVisit</TableCell>
+                    <TableCell>Ops</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {households.map((item: HouseholdProps, index: number) => (
+                    <Draggable
+                      key={item.id}
+                      draggableId={item.id.toString()}
+                      index={index}
+                    >
+                      {(provided, snapshot) => (
+                        <TableRow
+                          ref={provided.innerRef}
+                          {...provided.draggableProps}
+                          {...provided.dragHandleProps}
+                          // style={getItemStyle(
+                          //   snapshot.isDragging,
+                          //   provided.draggableProps.style,
+                          // )}
+                        >
+                          <TableCell align="left" padding="none">
+                            <div {...provided.dragHandleProps}>
+                              <ReorderIcon />
+                            </div>
+                          </TableCell>
+                          <TableCell
+                            sx={{ whiteSpace: 'nowrap' }}
+                            padding="none"
+                          >
+                            <TextField
+                              disabled={item.isLock}
+                              // required
+                              // id="standard-required"
+                              // label="Required"
+                              defaultValue={item.name}
+                              variant="standard"
+                              margin="dense"
+                              onChange={handleHouseholdNameChanged(item.id)}
+                            />
+                          </TableCell>
+                          <TableCell
+                            sx={{ whiteSpace: 'nowrap' }}
+                            padding="none"
+                          >
+                            <Checkbox
+                              id={item.id.toString()}
+                              disabled={item.isLock}
+                              checked={
+                                item.status === HouseholdVisitStatus.noVisit
+                              }
+                              onChange={onNoVisitStatusChanged(item.id)}
+                            />
+                          </TableCell>
+                          <TableCell padding="none">
+                            <HouseholdOpsButton
+                              iconName="delete"
+                              onClick={handleHouseholdDelete(item.id)}
+                            />
+                            <ToggleEditButton
+                              id={item.id}
+                              isLock={item.isLock}
+                              onClick={handleHouseholdEditToggle}
+                            />
+                          </TableCell>
+                        </TableRow>
+                      )}
+                    </Draggable>
+                  ))}
+                  {provided.placeholder}
+                </TableBody>
+              </Table>
+              <HouseholdOpsButton
+                align="left"
+                iconName="add"
+                onClick={handleHouseholdAdd}
+              />
+            </>
+          )}
+        </Droppable>
+      </DragDropContext>
+    </TableContainer>
+  );
+}
+
+export function Gate(props: any) {
+  const { visitTableInfo, households } = props;
+
+  const [isLock, setIsLock] = React.useState(true);
   const [householdList, setHouseholdList] = React.useState(households);
-  const handleEditToggle = (id: number) => () => {
+
+  const handleGateEditToggle = () => () => {
+    setIsLock(!isLock);
+  };
+
+  const handleHouseholdEditToggle = (id: number) => () => {
     setHouseholdList(
       householdList.map((household: HouseholdProps) => {
         const currHousehold = household;
@@ -131,7 +253,7 @@ export function GateEditable(props: GateProps) {
 
   const handleHouseholdDelete = (key: number) => () => {
     setHouseholdList(
-      householdList.filter(shop => {
+      householdList.filter((shop: HouseholdProps) => {
         return shop.id !== key;
       }),
     );
@@ -176,96 +298,72 @@ export function GateEditable(props: GateProps) {
     );
   };
 
-  // Normally you would want to split things out into separate components.
-  // But in this example everything is just done in one place for simplicity
+  const handleHouseholdButtonClick = (id: number) => () => {
+    setHouseholdList(
+      householdList.map((household: HouseholdProps, index: number) => {
+        const currHousehold = household;
+        if (currHousehold.id === id) {
+          if (currHousehold.status === HouseholdVisitStatus.noVisit) {
+            return currHousehold;
+          }
+          if (currHousehold.status === HouseholdVisitStatus.met) {
+            currHousehold.status = HouseholdVisitStatus.intact;
+          } else {
+            currHousehold.status = householdList[index].status + 1;
+          }
+        }
+
+        return currHousehold;
+      }),
+    );
+  };
+
+  const handleHouseholdNameChanged =
+    (id: number) => (e: React.ChangeEvent<HTMLInputElement>) => {
+      const text = e.target.value;
+      setHouseholdList(
+        householdList.map((household: HouseholdProps) => {
+          const currHousehold = household;
+          if (currHousehold.id === id) {
+            currHousehold.name = text;
+          }
+          return currHousehold;
+        }),
+      );
+    };
+
   return (
-    <DragDropContext onDragEnd={onDragEnd}>
-      <Droppable droppableId="droppable" direction="vertical">
-        {(provided, snapshot) => (
-          <>
-            <HouseholdOpsButton
-              align="left"
-              iconName="add"
-              onClick={handleHouseholdAdd}
+    <>
+      <Grid item xs={12}>
+        <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
+          <GateView
+            address={visitTableInfo[0]}
+            buildingName={visitTableInfo[1]}
+            gateName={visitTableInfo[2]}
+            households={householdList}
+            isLock={isLock}
+            handleGateEditToggle={handleGateEditToggle}
+            handleHouseholdButtonClick={handleHouseholdButtonClick}
+          />
+        </Paper>
+      </Grid>
+      {isLock ? (
+        <> </>
+      ) : (
+        <Grid item xs={12}>
+          <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
+            <GateEditable
+              households={householdList}
+              handleHouseholdEditToggle={handleHouseholdEditToggle}
+              handleHouseholdDelete={handleHouseholdDelete}
+              handleHouseholdAdd={handleHouseholdAdd}
+              onDragEnd={onDragEnd}
+              onNoVisitStatusChanged={onNoVisitStatusChanged}
+              handleHouseholdNameChanged={handleHouseholdNameChanged}
             />
-            <Table
-              aria-label="simple table"
-              ref={provided.innerRef}
-              // style={getListStyle(snapshot.isDraggingOver)}
-            >
-              <TableHead>
-                <TableRow>
-                  <TableCell>Title</TableCell>
-                  <TableCell>Name</TableCell>
-                  <TableCell>NoVisit</TableCell>
-                  <TableCell>Ops</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {householdList.map((item: HouseholdProps, index) => (
-                  <Draggable
-                    key={item.id}
-                    draggableId={item.id.toString()}
-                    index={index}
-                  >
-                    {(provided, snapshot) => (
-                      <TableRow
-                        ref={provided.innerRef}
-                        {...provided.draggableProps}
-                        {...provided.dragHandleProps}
-                        // style={getItemStyle(
-                        //   snapshot.isDragging,
-                        //   provided.draggableProps.style,
-                        // )}
-                      >
-                        <TableCell align="left" padding="none">
-                          <div {...provided.dragHandleProps}>
-                            <ReorderIcon />
-                          </div>
-                        </TableCell>
-                        <TableCell sx={{ whiteSpace: 'nowrap' }} padding="none">
-                          <TextField
-                            disabled={item.isLock}
-                            // required
-                            // id="standard-required"
-                            // label="Required"
-                            defaultValue={item.name}
-                            variant="standard"
-                            margin="dense"
-                          />
-                        </TableCell>
-                        <TableCell sx={{ whiteSpace: 'nowrap' }} padding="none">
-                          <Checkbox
-                            id={item.id.toString()}
-                            disabled={item.isLock}
-                            checked={
-                              item.status === HouseholdVisitStatus.noVisit
-                            }
-                            onChange={onNoVisitStatusChanged(item.id)}
-                          />
-                        </TableCell>
-                        <TableCell />
-                        <TableCell padding="none">
-                          <HouseholdOpsButton
-                            iconName="delete"
-                            onClick={handleHouseholdDelete(item.id)}
-                          />
-                          <ToggleEditButton
-                            id={item.id}
-                            isLock={item.isLock}
-                            onClick={handleEditToggle}
-                          />
-                        </TableCell>
-                      </TableRow>
-                    )}
-                  </Draggable>
-                ))}
-                {provided.placeholder}
-              </TableBody>
-            </Table>
-          </>
-        )}
-      </Droppable>
-    </DragDropContext>
+          </Paper>
+        </Grid>
+      )}
+    </>
   );
 }

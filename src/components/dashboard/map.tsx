@@ -12,7 +12,7 @@ import { styled } from '@mui/material/styles';
 import { DropResult } from 'react-beautiful-dnd';
 import Deposits from './Deposits';
 import Chart from './Chart';
-import { GateView, GateEditable } from '../territorycard/Gate';
+import { Gate } from '../territorycard/Gate';
 import { reorder } from '../helpers';
 import { HouseholdVisitStatus } from '../territorycard/HouseHold';
 import { TerritoryMap } from '../territorycard/TerritoryMap';
@@ -55,7 +55,7 @@ export default function MapPage() {
   // console.log(polygonPath);
 
   const VisitTableInfo = JSON.parse(
-    '["23-6","고운아이 어린이집","",["어린이집", 102, 201, 202, 301, 302, 401]]',
+    '["23-6","고운아이 어린이집","정문",["어린이집", 102, 201, 202, 301, 302, 401]]',
   );
 
   const households = VisitTableInfo[3].map((elem: any, index: number) => {
@@ -124,7 +124,7 @@ export default function MapPage() {
     >
       {/* <Toolbar /> */}
       <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-        <Grid container spacing={3}>
+        <Grid container spacing={1}>
           {/* Chart */}
           <Grid item xs={12} md={8} lg={9}>
             <Paper
@@ -159,29 +159,7 @@ export default function MapPage() {
             </Paper>
           </Grid>
           {/* 건물 */}
-          <Grid item xs={12}>
-            <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
-              <GateView
-                address={VisitTableInfo[0]}
-                buildingName={VisitTableInfo[1]}
-                gateName={VisitTableInfo[2]}
-                households={households}
-              />
-            </Paper>
-          </Grid>
-          <Grid item xs={12}>
-            {/* <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
-              <DraggableList items={items} onDragEnd={onDragEnd} />
-            </Paper> */}
-            <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
-              <GateEditable
-                address={VisitTableInfo[0]}
-                buildingName={VisitTableInfo[1]}
-                gateName={VisitTableInfo[2]}
-                households={households}
-              />
-            </Paper>
-          </Grid>
+          <Gate visitTableInfo={VisitTableInfo} households={households} />
         </Grid>
         <Copyright sx={{ pt: 4 }} />
       </Container>
