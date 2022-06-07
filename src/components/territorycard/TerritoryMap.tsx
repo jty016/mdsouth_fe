@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* global kakao */
 import * as React from 'react';
-import { Button, Grid } from '@mui/material';
+import { Button, Grid, IconButton } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import LockIcon from '@mui/icons-material/Lock';
@@ -9,6 +9,7 @@ import AddBoxOutlinedIcon from '@mui/icons-material/AddBoxOutlined';
 import PolylineOutlinedIcon from '@mui/icons-material/PolylineOutlined';
 import FileUploadOutlinedIcon from '@mui/icons-material/FileUploadOutlined';
 import { Map, Polygon, DrawingManager } from 'react-kakao-maps-sdk';
+import CenterFocusStrongIcon from '@mui/icons-material/CenterFocusStrong';
 
 export function IconLabelButtion(props: any) {
   const { disabled, visible, label, iconName, onClick } = props;
@@ -97,6 +98,11 @@ export function TerritoryMap(props: any) {
   const [isListenerAdded, setIsListenerAdded] = React.useState(false);
   const [errorMessage, setErrorMessage] = React.useState('');
   const [polygonPath, setPolygonPath] = React.useState(path);
+
+  const [currMap, setCurrMap] = React.useState({
+    level: 1,
+    center: centroid,
+  });
 
   const managerRef =
     React.useRef<
@@ -195,20 +201,34 @@ export function TerritoryMap(props: any) {
     const data = manager?.getData([kakao.maps.drawing.OverlayType.POLYGON]);
   };
 
+  const onCenterChanged = (map: kakao.maps.Map) => {
+    setCurrMap({
+      level: map.getLevel(),
+      center: {
+        lat: map.getCenter().getLat(),
+        lng: map.getCenter().getLng(),
+      },
+    });
+  };
+
+  const handleCenter = () => {
+    setCurrMap({
+      level: 1,
+      center: centroid,
+    });
+  };
+
   return (
     <>
       <Map
-        center={{
-          // 지도의 중심좌표
-          lat: centroid.lat,
-          lng: centroid.lng,
-        }}
+        center={currMap.center}
         style={{
           // 지도의 크기
           width: '100%',
           height: '450px',
         }}
         level={1} // 지도의 확대 레벨
+        onCenterChanged={onCenterChanged}
       >
         <InvisiblePolygonZoneBoundary
           visible={isLock}
@@ -291,6 +311,9 @@ export function TerritoryMap(props: any) {
           padding: '10px',
         }}
       >
+        <IconButton onClick={handleCenter}>
+          <CenterFocusStrongIcon />
+        </IconButton>
         <EditToggleButton isLock={isLock} onClick={handleEditToggle} />
         <IconLabelButtion
           disabled={!drawable}
@@ -313,6 +336,10 @@ export function TerritoryMap(props: any) {
         <Grid item xs={12}>
           {errorMessage}
         </Grid>
+        {/* <Grid item xs={12}>
+          <p>{`지도 레벨은 ${currMap.level} 이고`}</p>
+          <p>{`중심 좌표는 위도 ${currMap.center.lat}, 경도 ${currMap.center.lng} 입니다`}</p>
+        </Grid> */}
       </Grid>
     </>
   );
