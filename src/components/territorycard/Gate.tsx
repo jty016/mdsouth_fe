@@ -102,7 +102,14 @@ export const reorder = (
 
 export function GateEditable(props: any) {
   const {
+    isLock,
+    address,
+    buildingName,
+    gateName,
     households,
+    handleAddressChanged,
+    handleBuildingNameChanged,
+    handleGateNameChanged,
     handleHouseholdEditToggle,
     handleHouseholdDelete,
     handleHouseholdAdd,
@@ -119,6 +126,38 @@ export function GateEditable(props: any) {
         height: 400,
       }}
     >
+      <Grid container>
+        <Grid item xs={4}>
+          <TextField
+            variant="standard"
+            label="건물번호"
+            defaultValue={address}
+            size="small"
+            disabled={isLock}
+            onChange={handleAddressChanged}
+          />
+        </Grid>
+        <Grid item xs={4}>
+          <TextField
+            variant="standard"
+            label="건물이름"
+            defaultValue={buildingName}
+            size="small"
+            disabled={isLock}
+            onChange={handleBuildingNameChanged}
+          />
+        </Grid>
+        <Grid item xs={4}>
+          <TextField
+            variant="standard"
+            label="입구"
+            defaultValue={gateName}
+            size="small"
+            disabled={isLock}
+            onChange={handleGateNameChanged}
+          />
+        </Grid>
+      </Grid>
       <DragDropContext onDragEnd={onDragEnd}>
         <Droppable droppableId="droppable" direction="vertical">
           {(provided, snapshot) => (
@@ -134,10 +173,10 @@ export function GateEditable(props: any) {
               >
                 <TableHead>
                   <TableRow>
-                    <TableCell>Title</TableCell>
-                    <TableCell>Name</TableCell>
-                    <TableCell>NoVisit</TableCell>
-                    <TableCell>Ops</TableCell>
+                    <TableCell>이동</TableCell>
+                    <TableCell>세대이름</TableCell>
+                    <TableCell>방문금지</TableCell>
+                    <TableCell>작업</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -224,6 +263,9 @@ export function Gate(props: any) {
 
   const [isLock, setIsLock] = React.useState(true);
   const [householdList, setHouseholdList] = React.useState(gateInfo[3]);
+  const [address, setAddress] = React.useState(gateInfo[0]);
+  const [buildingName, setBuildingName] = React.useState(gateInfo[1]);
+  const [gateName, setGateName] = React.useState(gateInfo[2]);
 
   const handleGateEditToggle = () => () => {
     setIsLock(!isLock);
@@ -322,14 +364,31 @@ export function Gate(props: any) {
       );
     };
 
+  const handleAddressChanged = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const text = e.target.value;
+    setAddress(text);
+  };
+
+  const handleBuildingNameChanged = (
+    e: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const text = e.target.value;
+    setBuildingName(text);
+  };
+
+  const handleGateNameChanged = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const text = e.target.value;
+    setGateName(text);
+  };
+
   return (
     <>
       <Grid item xs={12}>
         <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
           <GateView
-            address={gateInfo[0]}
-            buildingName={gateInfo[1]}
-            gateName={gateInfo[2]}
+            address={address}
+            buildingName={buildingName}
+            gateName={gateName}
             households={householdList}
             isLock={isLock}
             handleGateEditToggle={handleGateEditToggle}
@@ -343,7 +402,14 @@ export function Gate(props: any) {
         <Grid item xs={12}>
           <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
             <GateEditable
+              isLock={isLock}
+              address={address}
+              buildingName={buildingName}
+              gateName={gateName}
               households={householdList}
+              handleAddressChanged={handleAddressChanged}
+              handleBuildingNameChanged={handleBuildingNameChanged}
+              handleGateNameChanged={handleGateNameChanged}
               handleHouseholdEditToggle={handleHouseholdEditToggle}
               handleHouseholdDelete={handleHouseholdDelete}
               handleHouseholdAdd={handleHouseholdAdd}
