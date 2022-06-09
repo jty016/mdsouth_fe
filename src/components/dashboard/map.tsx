@@ -14,7 +14,7 @@ import Deposits from './Deposits';
 import Chart from './Chart';
 import { Gate } from '../territorycard/Gate';
 import { reorder } from '../helpers';
-import { HouseholdVisitStatus } from '../territorycard/HouseHold';
+import { VisitStatus } from '../territorycard/types';
 import { TerritoryMap } from '../territorycard/TerritoryMap';
 
 const Item = styled(Paper)(({ theme }) => ({
@@ -54,22 +54,9 @@ export default function MapPage() {
   );
   // console.log(polygonPath);
 
-  const VisitTableInfo = JSON.parse(
-    '["23-6","고운아이 어린이집","정문",["어린이집", 102, 201, 202, 301, 302, 401]]',
+  const cardInfo = JSON.parse(
+    '[["23-6", "고운아이 어린이집", "정문", [{"id": 0, "name": "어린이집", "status": 0, "isLock": true}, {"id": 1, "name": 102, "status": 0, "isLock": true}, {"id": 2, "name": 201, "status": 0, "isLock": true}, {"id": 3, "name": 202, "status": 0, "isLock": true}, {"id": 4, "name": 301, "status": 0, "isLock": true}, {"id": 5, "name": 302, "status": 0, "isLock": true}, {"id": 6, "name": 401, "status": 0, "isLock": true}]], ["72-9", "", "정문", [{"id": 0, "name": 101, "status": 0, "isLock": true}, {"id": 1, "name": 102, "status": 0, "isLock": true}, {"id": 2, "name": 201, "status": 0, "isLock": true}, {"id": 3, "name": 202, "status": 0, "isLock": true}, {"id": 4, "name": 301, "status": 0, "isLock": true}, {"id": 5, "name": 302, "status": 0, "isLock": true}]], ["72-7", "", "쪽문(우)", [{"id": 0, "name": "3F", "status": 0, "isLock": true}]], ["72-7", "", "대문", [{"id": 0, "name": "1F", "status": 0, "isLock": true}]], ["72-5", "", "대문", [{"id": 0, "name": 103, "status": 0, "isLock": true}, {"id": 1, "name": 201, "status": 0, "isLock": true}, {"id": 2, "name": 202, "status": 0, "isLock": true}]], ["72-5", "", "쪽문(좌)", [{"id": 0, "name": 101, "status": 0, "isLock": true}, {"id": 1, "name": 102, "status": 0, "isLock": true}]], ["74", "천동나우길", "정문", [{"id": 0, "name": "B01", "status": 0, "isLock": true}, {"id": 1, "name": "B02", "status": 0, "isLock": true}, {"id": 2, "name": 101, "status": 0, "isLock": true}, {"id": 3, "name": 102, "status": 0, "isLock": true}, {"id": 4, "name": 201, "status": 0, "isLock": true}, {"id": 5, "name": 202, "status": 0, "isLock": true}, {"id": 6, "name": 301, "status": 0, "isLock": true}, {"id": 7, "name": 302, "status": 0, "isLock": true}, {"id": 8, "name": 401, "status": 0, "isLock": true}, {"id": 9, "name": 402, "status": 0, "isLock": true}]]]',
   );
-
-  const households = VisitTableInfo[3].map((elem: any, index: number) => {
-    const currHousehold = {
-      id: index,
-      name: elem.toString(),
-      status:
-        index === 0
-          ? HouseholdVisitStatus.noVisit
-          : HouseholdVisitStatus.intact,
-      isLock: true,
-    };
-    return currHousehold;
-  });
 
   let centroid = polygonPath.reduce(
     (prevPoint: Point, currPoint: Point) => {
@@ -162,7 +149,9 @@ export default function MapPage() {
             </Paper>
           </Grid>
           {/* 건물 */}
-          <Gate visitTableInfo={VisitTableInfo} households={households} />
+          {cardInfo.map((gateInfo: any, index: number) => (
+            <Gate gateInfo={gateInfo} />
+          ))}
         </Grid>
         <Copyright sx={{ pt: 4 }} />
       </Container>

@@ -8,32 +8,28 @@ import {
   TableRow,
   TableCell,
   Checkbox,
-  Button,
   Grid,
   Paper,
   TableContainer,
 } from '@mui/material';
-// import TableHead from '@mui/material/TableHead';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import TextField from '@mui/material/TextField';
 import ReorderIcon from '@mui/icons-material/Reorder';
 import {
-  HouseholdProps,
-  // HouseholdRow,
   HouseHoldButton,
   HouseholdOpsButton,
   ToggleEditButton,
-  HouseholdVisitStatus,
 } from './HouseHold';
 
-interface GateProps {
-  address: string;
-  buildingName: string;
-  gateName: string;
-  households: Array<HouseholdProps>;
+import { VisitStatus, HouseholdProps, GateProps } from './types';
+
+interface GateViewProps extends GateProps {
+  handleGateEditToggle: () => void;
+  isLock: boolean;
+  handleHouseholdButtonClick: (x: number) => () => void;
 }
 
-export function GateView(props: any) {
+export function GateView(props: GateViewProps) {
   const { address, buildingName, gateName, households, ...otherProps } = props;
   const { handleGateEditToggle, isLock, handleHouseholdButtonClick } =
     otherProps;
@@ -46,17 +42,17 @@ export function GateView(props: any) {
           <TableCell>{buildingName}</TableCell>
         </TableRow>
         <TableRow hover>
-          <TableCell component="th" scope="row" padding="none">
+          <TableCell component="th" scope="row" padding="none" width="10%">
             {gateName}
           </TableCell>
-          <TableCell component="th" scope="row" padding="none">
+          <TableCell width="20%" padding="none">
             <ToggleEditButton
               id={1}
               isLock={isLock}
               onClick={handleGateEditToggle}
             />
           </TableCell>
-          <TableCell align="left" size="small" padding="none">
+          <TableCell align="left" padding="none" width="70%">
             {households.map((household: HouseholdProps) => {
               return (
                 <HouseHoldButton
@@ -103,10 +99,6 @@ export const reorder = (
 
   return result;
 };
-
-interface GateEditableProps extends GateProps {
-  setHouseholdList(list: HouseholdProps[]): HouseholdProps[];
-}
 
 export function GateEditable(props: any) {
   const {
@@ -192,9 +184,7 @@ export function GateEditable(props: any) {
                             <Checkbox
                               id={item.id.toString()}
                               disabled={item.isLock}
-                              checked={
-                                item.status === HouseholdVisitStatus.noVisit
-                              }
+                              checked={item.status === VisitStatus.noVisit}
                               onChange={onNoVisitStatusChanged(item.id)}
                             />
                           </TableCell>
@@ -230,10 +220,10 @@ export function GateEditable(props: any) {
 }
 
 export function Gate(props: any) {
-  const { visitTableInfo, households } = props;
+  const { gateInfo } = props;
 
   const [isLock, setIsLock] = React.useState(true);
-  const [householdList, setHouseholdList] = React.useState(households);
+  const [householdList, setHouseholdList] = React.useState(gateInfo[3]);
 
   const handleGateEditToggle = () => () => {
     setIsLock(!isLock);
@@ -265,7 +255,7 @@ export function Gate(props: any) {
       {
         id: householdList.length,
         name: '',
-        status: HouseholdVisitStatus.intact,
+        status: VisitStatus.intact,
         isLock: false,
       },
     ]);
@@ -287,10 +277,10 @@ export function Gate(props: any) {
       householdList.map((household: HouseholdProps) => {
         const currHousehold = household;
         if (currHousehold.id === id) {
-          if (currHousehold.status === HouseholdVisitStatus.noVisit) {
-            currHousehold.status = HouseholdVisitStatus.intact;
+          if (currHousehold.status === VisitStatus.noVisit) {
+            currHousehold.status = VisitStatus.intact;
           } else {
-            currHousehold.status = HouseholdVisitStatus.noVisit;
+            currHousehold.status = VisitStatus.noVisit;
           }
         }
         return currHousehold;
@@ -303,11 +293,11 @@ export function Gate(props: any) {
       householdList.map((household: HouseholdProps, index: number) => {
         const currHousehold = household;
         if (currHousehold.id === id) {
-          if (currHousehold.status === HouseholdVisitStatus.noVisit) {
+          if (currHousehold.status === VisitStatus.noVisit) {
             return currHousehold;
           }
-          if (currHousehold.status === HouseholdVisitStatus.met) {
-            currHousehold.status = HouseholdVisitStatus.intact;
+          if (currHousehold.status === VisitStatus.met) {
+            currHousehold.status = VisitStatus.intact;
           } else {
             currHousehold.status = householdList[index].status + 1;
           }
@@ -337,9 +327,9 @@ export function Gate(props: any) {
       <Grid item xs={12}>
         <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
           <GateView
-            address={visitTableInfo[0]}
-            buildingName={visitTableInfo[1]}
-            gateName={visitTableInfo[2]}
+            address={gateInfo[0]}
+            buildingName={gateInfo[1]}
+            gateName={gateInfo[2]}
             households={householdList}
             isLock={isLock}
             handleGateEditToggle={handleGateEditToggle}
