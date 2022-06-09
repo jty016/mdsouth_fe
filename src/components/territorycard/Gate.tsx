@@ -40,19 +40,19 @@ export function GateView(props: GateViewProps) {
         <TableRow>
           <TableCell sx={{ whiteSpace: 'nowrap' }}>{address}</TableCell>
           <TableCell>{buildingName}</TableCell>
-        </TableRow>
-        <TableRow hover>
-          <TableCell component="th" scope="row" padding="none" width="10%">
-            {gateName}
-          </TableCell>
-          <TableCell width="20%" padding="none">
+          <TableCell align="right" padding="none">
             <ToggleEditButton
               id={1}
               isLock={isLock}
               onClick={handleGateEditToggle}
             />
           </TableCell>
-          <TableCell align="left" padding="none" width="70%">
+        </TableRow>
+        <TableRow hover>
+          <TableCell component="th" scope="row" padding="none" width="20%">
+            {gateName}
+          </TableCell>
+          <TableCell align="left" padding="none" width="80%" colSpan={2}>
             {households.map((household: HouseholdProps) => {
               return (
                 <HouseHoldButton
