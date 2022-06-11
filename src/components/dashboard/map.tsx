@@ -13,7 +13,7 @@ import { DropResult } from 'react-beautiful-dnd';
 import Deposits from './Deposits';
 import Chart from './Chart';
 import { Gate } from '../territorycard/Gate';
-import { reorder } from '../helpers';
+import { reorder } from '../territorycard/helpers';
 import { VisitStatus } from '../territorycard/types';
 import { TerritoryMap } from '../territorycard/TerritoryMap';
 
