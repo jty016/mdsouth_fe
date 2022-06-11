@@ -17,7 +17,7 @@ import TextField from '@mui/material/TextField';
 import ReorderIcon from '@mui/icons-material/Reorder';
 import {
   HouseHoldButton,
-  HouseholdOpsButton,
+  MultiOpsIconButton,
   ToggleEditButton,
 } from './HouseHold';
 
@@ -46,6 +46,7 @@ export function GateView(props: GateViewProps) {
               isLock={isLock}
               onClick={handleGateEditToggle}
             />
+             <MultiOpsIconButton iconName="delete" onClick={()=>{}} />
           </TableCell>
         </TableRow>
         <TableRow hover>
@@ -228,7 +229,7 @@ export function GateEditable(props: any) {
                             />
                           </TableCell>
                           <TableCell padding="none">
-                            <HouseholdOpsButton
+                            <MultiOpsIconButton
                               iconName="delete"
                               onClick={handleHouseholdDelete(item.id)}
                             />
@@ -245,7 +246,7 @@ export function GateEditable(props: any) {
                   {provided.placeholder}
                 </TableBody>
               </Table>
-              <HouseholdOpsButton
+              <MultiOpsIconButton
                 align="left"
                 iconName="add"
                 onClick={handleHouseholdAdd}

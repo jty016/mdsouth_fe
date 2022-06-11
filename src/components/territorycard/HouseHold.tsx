@@ -61,7 +61,7 @@ export function HouseHoldButton(props: any) {
   );
 }
 
-export function HouseholdOpsButton(props: any) {
+export function MultiOpsIconButton(props: any) {
   const { iconName, onClick } = props;
   let icon;
   switch (iconName) {
@@ -91,7 +91,7 @@ export function ToggleEditButton(props: any) {
   const { id, isLock, onClick } = props;
 
   if (isLock) {
-    return <HouseholdOpsButton iconName="edit" onClick={onClick(id)} />;
+    return <MultiOpsIconButton iconName="edit" onClick={onClick(id)} />;
   }
-  return <HouseholdOpsButton iconName="lock" onClick={onClick(id)} />;
+  return <MultiOpsIconButton iconName="lock" onClick={onClick(id)} />;
 }
