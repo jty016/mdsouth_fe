@@ -13,6 +13,7 @@ export interface HouseholdProps {
 }
 
 export interface GateProps {
+  id: number
   address: string;
   buildingName: string;
   gateName: string;

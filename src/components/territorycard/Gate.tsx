@@ -27,12 +27,18 @@ interface GateViewProps extends GateProps {
   handleGateEditToggle: () => void;
   isLock: boolean;
   handleHouseholdButtonClick: (x: number) => () => void;
+  handleGateDelete: (id: number) => () => void;
 }
 
 export function GateView(props: GateViewProps) {
-  const { address, buildingName, gateName, households, ...otherProps } = props;
-  const { handleGateEditToggle, isLock, handleHouseholdButtonClick } =
-    otherProps;
+  const { id, address, buildingName, gateName, households, ...otherProps } =
+    props;
+  const {
+    handleGateEditToggle,
+    isLock,
+    handleHouseholdButtonClick,
+    handleGateDelete,
+  } = otherProps;
 
   return (
     <Table aria-label="simple table">
@@ -46,7 +52,10 @@ export function GateView(props: GateViewProps) {
               isLock={isLock}
               onClick={handleGateEditToggle}
             />
-             <MultiOpsIconButton iconName="delete" onClick={()=>{}} />
+            <MultiOpsIconButton
+              iconName="delete"
+              onClick={handleGateDelete(id)}
+            />
           </TableCell>
         </TableRow>
         <TableRow hover>
@@ -260,13 +269,13 @@ export function GateEditable(props: any) {
 }
 
 export function Gate(props: any) {
-  const { gateInfo } = props;
+  const { handleGateDelete, id, ...others } = props;
 
   const [isLock, setIsLock] = React.useState(true);
-  const [householdList, setHouseholdList] = React.useState(gateInfo[3]);
-  const [address, setAddress] = React.useState(gateInfo[0]);
-  const [buildingName, setBuildingName] = React.useState(gateInfo[1]);
-  const [gateName, setGateName] = React.useState(gateInfo[2]);
+  const [householdList, setHouseholdList] = React.useState(others.households);
+  const [address, setAddress] = React.useState(others.address);
+  const [buildingName, setBuildingName] = React.useState(others.buildingName);
+  const [gateName, setGateName] = React.useState(others.gateName);
 
   const handleGateEditToggle = () => () => {
     setIsLock(!isLock);
@@ -384,9 +393,10 @@ export function Gate(props: any) {
 
   return (
     <>
-      <Grid item xs={12}>
+      <Grid item xs={12} {...others}>
         <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
           <GateView
+            id={id}
             address={address}
             buildingName={buildingName}
             gateName={gateName}
@@ -394,6 +404,7 @@ export function Gate(props: any) {
             isLock={isLock}
             handleGateEditToggle={handleGateEditToggle}
             handleHouseholdButtonClick={handleHouseholdButtonClick}
+            handleGateDelete={handleGateDelete}
           />
         </Paper>
       </Grid>
