@@ -90,7 +90,7 @@ function InvisiblePolygonZoneBoundary(props: any) {
 }
 
 export function TerritoryMap(props: any) {
-  const { centroid, path } = props;
+  const { centroid, path, handleGateAdd } = props;
 
   const [isLock, setIsLock] = React.useState(true);
   const [loadable, setLoadable] = React.useState(false);
@@ -334,6 +334,12 @@ export function TerritoryMap(props: any) {
       </div>
       <Grid container>
         <Grid item xs={12}>
+          <IconLabelButtion
+            visible
+            iconName="add"
+            label="구역추가하기"
+            onClick={handleGateAdd}
+          />
           {errorMessage}
         </Grid>
         {/* <Grid item xs={12}>

@@ -8,35 +8,37 @@ import {
   TableRow,
   TableCell,
   Checkbox,
-  Button,
   Grid,
   Paper,
   TableContainer,
 } from '@mui/material';
-// import TableHead from '@mui/material/TableHead';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import TextField from '@mui/material/TextField';
 import ReorderIcon from '@mui/icons-material/Reorder';
 import {
-  HouseholdProps,
-  // HouseholdRow,
   HouseHoldButton,
-  HouseholdOpsButton,
+  MultiOpsIconButton,
   ToggleEditButton,
-  HouseholdVisitStatus,
 } from './HouseHold';
 
-interface GateProps {
-  address: string;
-  buildingName: string;
-  gateName: string;
-  households: Array<HouseholdProps>;
+import { VisitStatus, HouseholdProps, GateProps } from './types';
+
+interface GateViewProps extends GateProps {
+  handleGateEditToggle: () => void;
+  isLock: boolean;
+  handleHouseholdButtonClick: (x: number) => () => void;
+  handleGateDelete: (id: number) => () => void;
 }
 
-export function GateView(props: any) {
-  const { address, buildingName, gateName, households, ...otherProps } = props;
-  const { handleGateEditToggle, isLock, handleHouseholdButtonClick } =
-    otherProps;
+export function GateView(props: GateViewProps) {
+  const { id, address, buildingName, gateName, households, ...otherProps } =
+    props;
+  const {
+    handleGateEditToggle,
+    isLock,
+    handleHouseholdButtonClick,
+    handleGateDelete,
+  } = otherProps;
 
   return (
     <Table aria-label="simple table">
@@ -44,19 +46,23 @@ export function GateView(props: any) {
         <TableRow>
           <TableCell sx={{ whiteSpace: 'nowrap' }}>{address}</TableCell>
           <TableCell>{buildingName}</TableCell>
-        </TableRow>
-        <TableRow hover>
-          <TableCell component="th" scope="row" padding="none">
-            {gateName}
-          </TableCell>
-          <TableCell component="th" scope="row" padding="none">
+          <TableCell align="right" padding="none">
             <ToggleEditButton
               id={1}
               isLock={isLock}
               onClick={handleGateEditToggle}
             />
+            <MultiOpsIconButton
+              iconName="delete"
+              onClick={handleGateDelete(id)}
+            />
           </TableCell>
-          <TableCell align="left" size="small" padding="none">
+        </TableRow>
+        <TableRow hover>
+          <TableCell component="th" scope="row" padding="none" width="20%">
+            {gateName}
+          </TableCell>
+          <TableCell align="left" padding="none" width="80%" colSpan={2}>
             {households.map((household: HouseholdProps) => {
               return (
                 <HouseHoldButton
@@ -104,13 +110,16 @@ export const reorder = (
   return result;
 };
 
-interface GateEditableProps extends GateProps {
-  setHouseholdList(list: HouseholdProps[]): HouseholdProps[];
-}
-
 export function GateEditable(props: any) {
   const {
+    isLock,
+    address,
+    buildingName,
+    gateName,
     households,
+    handleAddressChanged,
+    handleBuildingNameChanged,
+    handleGateNameChanged,
     handleHouseholdEditToggle,
     handleHouseholdDelete,
     handleHouseholdAdd,
@@ -127,6 +136,38 @@ export function GateEditable(props: any) {
         height: 400,
       }}
     >
+      <Grid container>
+        <Grid item xs={4}>
+          <TextField
+            variant="standard"
+            label="건물번호"
+            defaultValue={address}
+            size="small"
+            disabled={isLock}
+            onChange={handleAddressChanged}
+          />
+        </Grid>
+        <Grid item xs={4}>
+          <TextField
+            variant="standard"
+            label="건물이름"
+            defaultValue={buildingName}
+            size="small"
+            disabled={isLock}
+            onChange={handleBuildingNameChanged}
+          />
+        </Grid>
+        <Grid item xs={4}>
+          <TextField
+            variant="standard"
+            label="입구"
+            defaultValue={gateName}
+            size="small"
+            disabled={isLock}
+            onChange={handleGateNameChanged}
+          />
+        </Grid>
+      </Grid>
       <DragDropContext onDragEnd={onDragEnd}>
         <Droppable droppableId="droppable" direction="vertical">
           {(provided, snapshot) => (
@@ -142,10 +183,10 @@ export function GateEditable(props: any) {
               >
                 <TableHead>
                   <TableRow>
-                    <TableCell>Title</TableCell>
-                    <TableCell>Name</TableCell>
-                    <TableCell>NoVisit</TableCell>
-                    <TableCell>Ops</TableCell>
+                    <TableCell>이동</TableCell>
+                    <TableCell>세대이름</TableCell>
+                    <TableCell>방문금지</TableCell>
+                    <TableCell>작업</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -192,14 +233,12 @@ export function GateEditable(props: any) {
                             <Checkbox
                               id={item.id.toString()}
                               disabled={item.isLock}
-                              checked={
-                                item.status === HouseholdVisitStatus.noVisit
-                              }
+                              checked={item.status === VisitStatus.noVisit}
                               onChange={onNoVisitStatusChanged(item.id)}
                             />
                           </TableCell>
                           <TableCell padding="none">
-                            <HouseholdOpsButton
+                            <MultiOpsIconButton
                               iconName="delete"
                               onClick={handleHouseholdDelete(item.id)}
                             />
@@ -216,7 +255,7 @@ export function GateEditable(props: any) {
                   {provided.placeholder}
                 </TableBody>
               </Table>
-              <HouseholdOpsButton
+              <MultiOpsIconButton
                 align="left"
                 iconName="add"
                 onClick={handleHouseholdAdd}
@@ -230,10 +269,13 @@ export function GateEditable(props: any) {
 }
 
 export function Gate(props: any) {
-  const { visitTableInfo, households } = props;
+  const { handleGateDelete, id, ...others } = props;
 
   const [isLock, setIsLock] = React.useState(true);
-  const [householdList, setHouseholdList] = React.useState(households);
+  const [householdList, setHouseholdList] = React.useState(others.households);
+  const [address, setAddress] = React.useState(others.address);
+  const [buildingName, setBuildingName] = React.useState(others.buildingName);
+  const [gateName, setGateName] = React.useState(others.gateName);
 
   const handleGateEditToggle = () => () => {
     setIsLock(!isLock);
@@ -265,7 +307,7 @@ export function Gate(props: any) {
       {
         id: householdList.length,
         name: '',
-        status: HouseholdVisitStatus.intact,
+        status: VisitStatus.intact,
         isLock: false,
       },
     ]);
@@ -287,10 +329,10 @@ export function Gate(props: any) {
       householdList.map((household: HouseholdProps) => {
         const currHousehold = household;
         if (currHousehold.id === id) {
-          if (currHousehold.status === HouseholdVisitStatus.noVisit) {
-            currHousehold.status = HouseholdVisitStatus.intact;
+          if (currHousehold.status === VisitStatus.noVisit) {
+            currHousehold.status = VisitStatus.intact;
           } else {
-            currHousehold.status = HouseholdVisitStatus.noVisit;
+            currHousehold.status = VisitStatus.noVisit;
           }
         }
         return currHousehold;
@@ -303,11 +345,11 @@ export function Gate(props: any) {
       householdList.map((household: HouseholdProps, index: number) => {
         const currHousehold = household;
         if (currHousehold.id === id) {
-          if (currHousehold.status === HouseholdVisitStatus.noVisit) {
+          if (currHousehold.status === VisitStatus.noVisit) {
             return currHousehold;
           }
-          if (currHousehold.status === HouseholdVisitStatus.met) {
-            currHousehold.status = HouseholdVisitStatus.intact;
+          if (currHousehold.status === VisitStatus.met) {
+            currHousehold.status = VisitStatus.intact;
           } else {
             currHousehold.status = householdList[index].status + 1;
           }
@@ -332,18 +374,37 @@ export function Gate(props: any) {
       );
     };
 
+  const handleAddressChanged = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const text = e.target.value;
+    setAddress(text);
+  };
+
+  const handleBuildingNameChanged = (
+    e: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const text = e.target.value;
+    setBuildingName(text);
+  };
+
+  const handleGateNameChanged = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const text = e.target.value;
+    setGateName(text);
+  };
+
   return (
     <>
-      <Grid item xs={12}>
+      <Grid item xs={12} {...others}>
         <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
           <GateView
-            address={visitTableInfo[0]}
-            buildingName={visitTableInfo[1]}
-            gateName={visitTableInfo[2]}
+            id={id}
+            address={address}
+            buildingName={buildingName}
+            gateName={gateName}
             households={householdList}
             isLock={isLock}
             handleGateEditToggle={handleGateEditToggle}
             handleHouseholdButtonClick={handleHouseholdButtonClick}
+            handleGateDelete={handleGateDelete}
           />
         </Paper>
       </Grid>
@@ -353,7 +414,14 @@ export function Gate(props: any) {
         <Grid item xs={12}>
           <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
             <GateEditable
+              isLock={isLock}
+              address={address}
+              buildingName={buildingName}
+              gateName={gateName}
               households={householdList}
+              handleAddressChanged={handleAddressChanged}
+              handleBuildingNameChanged={handleBuildingNameChanged}
+              handleGateNameChanged={handleGateNameChanged}
               handleHouseholdEditToggle={handleHouseholdEditToggle}
               handleHouseholdDelete={handleHouseholdDelete}
               handleHouseholdAdd={handleHouseholdAdd}
